@@ -1,0 +1,58 @@
+# Protection des fichiers sensibles
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protection du fichier de configuration
+<FilesMatch "config\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Activer le rewrite
+RewriteEngine On
+
+# Rediriger vers HTTPS (décommenter en production)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Réécriture d'URL pour les profils
+RewriteRule ^user/([a-zA-Z0-9_-]+)$ profile.php?username=$1 [L,QSA]
+
+# Réécriture d'URL pour les posts
+RewriteRule ^post/([0-9]+)$ post.php?id=$1 [L,QSA]
+
+# Réécriture d'URL pour les tags
+RewriteRule ^tag/([a-zA-Z0-9_-]+)$ tag.php?tag=$1 [L,QSA]
+
+# Compression Gzip
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Mise en cache des fichiers statiques
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+</IfModule>
+
+# Headers de sécurité
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Désactiver l'affichage des répertoires
+Options -Indexes
+
+# Encodage par défaut
+AddDefaultCharset UTF-8
